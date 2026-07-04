@@ -16,7 +16,7 @@ dependencies = [
     "flask-smorest==0.47.0",
     "marshmallow==3.26.2",
     "gunicorn==23.0.0",
-    "scikit-learn==1.8.0",
+    "scikit-learn==1.7.2",
     "pandas==2.3.0",
     "joblib==1.5.1",
 ]
@@ -28,6 +28,7 @@ dev = [
     "coverage[toml]==7.15.0",
     "ruff==0.15.20",
     "mypy==1.20.2",
+    "pandas-stubs>=2.2",
 ]
 
 [tool.setuptools.packages.find]
@@ -47,14 +48,15 @@ skip_covered = true
 fail_under = 90
 
 [tool.ruff]
-target-version = "py312"
+target-version = "py310"
 line-length = 100
 
 [tool.ruff.lint]
 select = ["B", "E", "F", "I", "UP"]
+ignore = ["UP017"]
 
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.10"
 check_untyped_defs = true
 disallow_untyped_defs = true
 no_implicit_optional = true
