@@ -111,6 +111,7 @@ CATALOG: tuple[dict[str, Any], ...] = (
         "name": "obesity",
         "label": "Classificacao de obesidade",
         "type": "string",
+        "required": False,
         "options": (
             ("Insufficient_Weight", "Abaixo do peso"),
             ("Normal_Weight", "Peso normal"),
@@ -133,7 +134,7 @@ def seed(database_url: str) -> None:
                 "label": field["label"],
                 "data_type": field["type"],
                 "display_order": field_order,
-                "required": True,
+                "required": field.get("required", True),
                 "active": True,
             }
             field_insert = insert(DomainField.__table__).values(**field_values)

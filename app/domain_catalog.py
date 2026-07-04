@@ -7,7 +7,7 @@ from typing import Final, Literal
 
 DomainType = Literal["integer", "string"]
 
-RECORD_FIELDS: Final[tuple[str, ...]] = (
+INPUT_FIELDS: Final[tuple[str, ...]] = (
     "idade",
     "sexo_biologico",
     "come_vegetaiis",
@@ -20,7 +20,18 @@ RECORD_FIELDS: Final[tuple[str, ...]] = (
     "historico_familiar",
     "alimentos_calorico",
     "meio_transporte",
-    "obesity",
+)
+
+RECORD_FIELDS: Final[tuple[str, ...]] = INPUT_FIELDS + ("obesity",)
+
+OBESITY_CLASSES: Final[tuple[str, ...]] = (
+    "Insufficient_Weight",
+    "Normal_Weight",
+    "Obesity_Type_I",
+    "Obesity_Type_II",
+    "Obesity_Type_III",
+    "Overweight_Level_I",
+    "Overweight_Level_II",
 )
 
 DOMAIN_VALUES = MappingProxyType(
@@ -42,17 +53,15 @@ DOMAIN_VALUES = MappingProxyType(
             "public_transportation",
             "walking",
         ),
-        "obesity": (
-            "Insufficient_Weight",
-            "Normal_Weight",
-            "Overweight_Level_I",
-            "Overweight_Level_II",
-            "Obesity_Type_I",
-            "Obesity_Type_II",
-            "Obesity_Type_III",
-        ),
+        "obesity": OBESITY_CLASSES,
     }
 )
 
 
-__all__ = ["DOMAIN_VALUES", "DomainType", "RECORD_FIELDS"]
+__all__ = [
+    "DOMAIN_VALUES",
+    "DomainType",
+    "INPUT_FIELDS",
+    "OBESITY_CLASSES",
+    "RECORD_FIELDS",
+]

@@ -6,7 +6,7 @@ from typing import Any
 import pytest
 from marshmallow import ValidationError
 
-from app.domain_catalog import DOMAIN_VALUES, RECORD_FIELDS
+from app.domain_catalog import DOMAIN_VALUES, INPUT_FIELDS
 from app.schemas import ObesityRecordCreateSchema
 
 
@@ -25,8 +25,10 @@ def valid_payload() -> dict[str, Any]:
         "historico_familiar": "yes",
         "alimentos_calorico": "no",
         "meio_transporte": "public_transportation",
-        "obesity": "Normal_Weight",
     }
+
+
+INPUT_DOMAIN_VALUES = {k: v for k, v in DOMAIN_VALUES.items() if k != "obesity"}
 
 
 def _assert_error(payload: dict[str, Any], field: str, code: str) -> None:
@@ -37,7 +39,7 @@ def _assert_error(payload: dict[str, Any], field: str, code: str) -> None:
 
 def test_valid_payload_round_trips(valid_payload: dict[str, Any]) -> None:
     assert ObesityRecordCreateSchema().load(valid_payload) == valid_payload
-    assert tuple(valid_payload) == RECORD_FIELDS
+    assert tuple(valid_payload) == INPUT_FIELDS
 
 
 @pytest.mark.parametrize("idade", [1, 18, 35, 120])
@@ -58,13 +60,13 @@ def test_ct_idade_04_rejects_non_integer_types(valid_payload: dict[str, Any], va
     _assert_error(valid_payload, "idade", "invalid_type")
 
 
-@pytest.mark.parametrize("field", RECORD_FIELDS)
+@pytest.mark.parametrize("field", INPUT_FIELDS)
 def test_null_is_rejected(valid_payload: dict[str, Any], field: str) -> None:
     valid_payload[field] = None
     _assert_error(valid_payload, field, "null_not_allowed")
 
 
-@pytest.mark.parametrize("field", RECORD_FIELDS)
+@pytest.mark.parametrize("field", INPUT_FIELDS)
 def test_omitted_field_is_rejected(valid_payload: dict[str, Any], field: str) -> None:
     valid_payload.pop(field)
     _assert_error(valid_payload, field, "required")
@@ -72,7 +74,7 @@ def test_omitted_field_is_rejected(valid_payload: dict[str, Any], field: str) ->
 
 @pytest.mark.parametrize(
     ("field", "values"),
-    [(field, values) for field, values in DOMAIN_VALUES.items()],
+    [(field, values) for field, values in INPUT_DOMAIN_VALUES.items()],
 )
 def test_each_domain_value_is_accepted(
     valid_payload: dict[str, Any], field: str, values: tuple[Any, ...]
@@ -83,16 +85,16 @@ def test_each_domain_value_is_accepted(
         assert ObesityRecordCreateSchema().load(payload)[field] == value
 
 
-@pytest.mark.parametrize("field", DOMAIN_VALUES)
+@pytest.mark.parametrize("field", INPUT_DOMAIN_VALUES)
 def test_value_outside_domain_is_rejected(valid_payload: dict[str, Any], field: str) -> None:
-    valid_payload[field] = 999 if isinstance(DOMAIN_VALUES[field][0], int) else "invalid"
+    valid_payload[field] = 999 if isinstance(INPUT_DOMAIN_VALUES[field][0], int) else "invalid"
     _assert_error(valid_payload, field, "invalid_domain")
 
 
-@pytest.mark.parametrize("field", DOMAIN_VALUES)
+@pytest.mark.parametrize("field", INPUT_DOMAIN_VALUES)
 def test_domain_field_rejects_wrong_type(valid_payload: dict[str, Any], field: str) -> None:
     valid_payload[field] = (
-        str(DOMAIN_VALUES[field][0]) if isinstance(DOMAIN_VALUES[field][0], int) else 1
+        str(INPUT_DOMAIN_VALUES[field][0]) if isinstance(INPUT_DOMAIN_VALUES[field][0], int) else 1
     )
     _assert_error(valid_payload, field, "invalid_type")
 
@@ -100,3 +102,8 @@ def test_domain_field_rejects_wrong_type(valid_payload: dict[str, Any], field: s
 def test_unknown_field_is_rejected(valid_payload: dict[str, Any]) -> None:
     valid_payload["extra"] = "value"
     _assert_error(valid_payload, "extra", "unknown_field")
+
+
+def test_obesity_in_payload_is_rejected(valid_payload: dict[str, Any]) -> None:
+    valid_payload["obesity"] = "Normal_Weight"
+    _assert_error(valid_payload, "obesity", "unknown_field")

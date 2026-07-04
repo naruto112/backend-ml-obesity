@@ -1,8 +1,12 @@
-FROM python:3.10.18-slim-bookworm
+FROM python:3.12-slim-bookworm
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1
+    PIP_NO_CACHE_DIR=1 \
+    OMP_NUM_THREADS=1 \
+    OPENBLAS_NUM_THREADS=1 \
+    MKL_NUM_THREADS=1 \
+    NUMEXPR_NUM_THREADS=1
 
 WORKDIR /app
 
@@ -12,11 +16,13 @@ COPY pyproject.toml ./
 COPY app ./app
 COPY migrations ./migrations
 COPY seeds ./seeds
+COPY artifacts ./artifacts
 COPY alembic.ini wsgi.py ./
 
 RUN python -m pip install --upgrade pip==26.1.2 \
     && python -m pip install . \
-    && chown -R app:app /app
+    && chown -R app:app /app \
+    && chmod -R a-w /app/artifacts
 
 USER app
 EXPOSE 8000

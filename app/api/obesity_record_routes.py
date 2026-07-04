@@ -3,7 +3,7 @@
 from typing import Any
 from uuid import UUID
 
-from flask import request, url_for
+from flask import current_app, request, url_for
 from flask.views import MethodView
 from flask_smorest import Blueprint  # type: ignore[import-untyped]
 from marshmallow import ValidationError
@@ -25,7 +25,8 @@ record_blueprint = Blueprint(
 
 
 def _service() -> ObesityRecordService:
-    return ObesityRecordService(ObesityRecordRepository(db.session), db.session)
+    predictor = current_app.config["ML_PREDICTOR"]
+    return ObesityRecordService(ObesityRecordRepository(db.session), db.session, predictor)
 
 
 def _isoformat(value: Any) -> str:

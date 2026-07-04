@@ -1,5 +1,8 @@
 """Flask application factory."""
 
+import logging
+from pathlib import Path
+
 from flask import Flask
 
 from app.api.domain_routes import domain_blueprint
@@ -9,7 +12,16 @@ from app.api.middleware import configure_logging, register_request_middleware
 from app.api.obesity_record_routes import record_blueprint
 from app.config import load_config
 from app.extensions import api, db
+from app.ml.model_loader import ModelArtifactError, load_model
+from app.ml.predictor import ObesityPredictor
 from app.schemas import ObesityRecordCreateSchema
+
+logger = logging.getLogger(__name__)
+
+DEFAULT_MODEL_PATH = str(Path(__file__).resolve().parent.parent / "artifacts" / "hgb.joblib")
+DEFAULT_MANIFEST_PATH = str(
+    Path(__file__).resolve().parent.parent / "artifacts" / "hgb.manifest.json"
+)
 
 
 def create_app(config_name: str | None = None) -> Flask:
@@ -32,7 +44,28 @@ def create_app(config_name: str | None = None) -> Flask:
     # Register model metadata for Alembic without touching the database.
     from app import models  # noqa: F401
 
+    # Load ML model once per worker at startup.
+    if not app.config.get("TESTING"):
+        _bootstrap_ml(app)
+
     return app
+
+
+def _bootstrap_ml(app: Flask) -> None:
+    """Load and verify the ML model artifact, storing the predictor in app config."""
+    import os
+
+    model_path = Path(os.getenv("ML_MODEL_PATH", DEFAULT_MODEL_PATH))
+    manifest_path = Path(os.getenv("ML_MANIFEST_PATH", DEFAULT_MANIFEST_PATH))
+
+    try:
+        model = load_model(model_path, manifest_path)
+        predictor = ObesityPredictor(model)
+        app.config["ML_PREDICTOR"] = predictor
+        logger.info("ml_bootstrap_complete")
+    except ModelArtifactError:
+        logger.exception("ml_bootstrap_failed")
+        raise
 
 
 __all__ = ["create_app"]

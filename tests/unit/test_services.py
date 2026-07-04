@@ -52,6 +52,19 @@ class TransactionStub:
         self.rollbacks += 1
 
 
+class PredictorStub:
+    def __init__(self, result: str = "Normal_Weight", error: Exception | None = None) -> None:
+        self.result = result
+        self.error = error
+        self.called_with = None
+
+    def predict(self, command):
+        self.called_with = command
+        if self.error is not None:
+            raise self.error
+        return self.result
+
+
 def test_domain_service_orders_and_converts_integer_options() -> None:
     field = SimpleNamespace(
         name="sexo_biologico",
@@ -87,22 +100,26 @@ def test_domain_service_raises_not_found() -> None:
         service.get_active_domain("unknown")
 
 
-def test_record_service_commits_successful_create() -> None:
+def test_record_service_predicts_and_commits() -> None:
     record = SimpleNamespace(id=uuid4())
     repository = RecordRepositoryStub(record)
     transaction = TransactionStub()
-    service = ObesityRecordService(repository, transaction)  # type: ignore[arg-type]
+    predictor = PredictorStub("Obesity_Type_I")
+    service = ObesityRecordService(repository, transaction, predictor)  # type: ignore[arg-type]
 
-    assert service.create_record({"idade": 35}) is record
-    assert repository.added == {"idade": 35}
+    command = {"idade": 35}
+    assert service.create_record(command) is record
+    assert repository.added == {"idade": 35, "obesity": "Obesity_Type_I"}
+    assert predictor.called_with is command
     assert transaction.commits == 1
     assert transaction.rollbacks == 0
 
 
-def test_record_service_rolls_back_failed_create() -> None:
+def test_record_service_rolls_back_on_repository_error() -> None:
     repository = RecordRepositoryStub(error=RuntimeError("database failed"))
     transaction = TransactionStub()
-    service = ObesityRecordService(repository, transaction)  # type: ignore[arg-type]
+    predictor = PredictorStub()
+    service = ObesityRecordService(repository, transaction, predictor)  # type: ignore[arg-type]
 
     with pytest.raises(RuntimeError, match="database failed"):
         service.create_record({"idade": 35})
@@ -110,16 +127,31 @@ def test_record_service_rolls_back_failed_create() -> None:
     assert transaction.rollbacks == 1
 
 
+def test_record_service_rolls_back_on_predictor_error() -> None:
+    record = SimpleNamespace(id=uuid4())
+    repository = RecordRepositoryStub(record)
+    transaction = TransactionStub()
+    predictor = PredictorStub(error=RuntimeError("model failed"))
+    service = ObesityRecordService(repository, transaction, predictor)  # type: ignore[arg-type]
+
+    with pytest.raises(RuntimeError, match="model failed"):
+        service.create_record({"idade": 35})
+    assert repository.added is None
+    assert transaction.commits == 0
+    assert transaction.rollbacks == 1
+
+
 def test_record_service_reads_or_raises_not_found() -> None:
     record = SimpleNamespace(id=uuid4())
     transaction = TransactionStub()
+    predictor = PredictorStub()
     service = ObesityRecordService(  # type: ignore[arg-type]
-        RecordRepositoryStub(record), transaction
+        RecordRepositoryStub(record), transaction, predictor
     )
     assert service.get_record(record.id) is record
 
     missing = ObesityRecordService(  # type: ignore[arg-type]
-        RecordRepositoryStub(), transaction
+        RecordRepositoryStub(), transaction, predictor
     )
     with pytest.raises(ObesityRecordNotFoundError):
         missing.get_record(uuid4())

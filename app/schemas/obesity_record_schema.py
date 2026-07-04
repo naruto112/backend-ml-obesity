@@ -2,7 +2,7 @@
 
 from marshmallow import RAISE, Schema, fields, validate
 
-from app.domain_catalog import DOMAIN_VALUES
+from app.domain_catalog import DOMAIN_VALUES, OBESITY_CLASSES
 from app.schemas.fields import StrictInteger, StrictString
 
 COMMON_ERRORS = {
@@ -30,7 +30,7 @@ def _string_domain(field_name: str) -> StrictString:
 
 
 class ObesityRecordCreateSchema(Schema):
-    """Validate the exact 13-field v1 input contract."""
+    """Validate the exact 12-field v1 input contract (obesity is server-derived)."""
 
     error_messages = {"unknown": "unknown_field"}
 
@@ -54,7 +54,6 @@ class ObesityRecordCreateSchema(Schema):
     historico_familiar = _string_domain("historico_familiar")
     alimentos_calorico = _string_domain("alimentos_calorico")
     meio_transporte = _string_domain("meio_transporte")
-    obesity = _string_domain("obesity")
 
 
 class ObesityRecordCreatedSchema(Schema):
@@ -62,9 +61,28 @@ class ObesityRecordCreatedSchema(Schema):
     created_at = fields.String(required=True)
 
 
-class ObesityRecordReadSchema(ObesityRecordCreateSchema):
+class ObesityRecordReadSchema(Schema):
+    """Read schema with all 13 fields: 12 inputs + server-derived obesity."""
+
     id = fields.UUID(required=True)
     created_at = fields.String(required=True)
+
+    idade = StrictInteger(required=True)
+    sexo_biologico = StrictInteger(required=True)
+    come_vegetaiis = StrictInteger(required=True)
+    refeicoes_diariamente = StrictInteger(required=True)
+    come_entre_refeicao = StrictString(required=True)
+    litro_agua = StrictInteger(required=True)
+    frequencia_semanal_atvidade_fisica = StrictInteger(required=True)
+    horas_dispositivo_eletronico = StrictInteger(required=True)
+    consome_bebida_alcoolica = StrictString(required=True)
+    historico_familiar = StrictString(required=True)
+    alimentos_calorico = StrictString(required=True)
+    meio_transporte = StrictString(required=True)
+    obesity = StrictString(
+        required=True,
+        validate=validate.OneOf(OBESITY_CLASSES, error="invalid_domain"),
+    )
 
 
 __all__ = [

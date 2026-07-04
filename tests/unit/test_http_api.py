@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from types import SimpleNamespace
 from uuid import uuid4
 
@@ -12,6 +12,21 @@ from app.api import domain_routes, obesity_record_routes
 from app.domain_catalog import RECORD_FIELDS
 from app.services import DomainNotFoundError, ObesityRecordNotFoundError
 
+VALID_INPUT = {
+    "idade": 35,
+    "sexo_biologico": 1,
+    "come_vegetaiis": 2,
+    "refeicoes_diariamente": 3,
+    "come_entre_refeicao": "somentimes",
+    "litro_agua": 2,
+    "frequencia_semanal_atvidade_fisica": 2,
+    "horas_dispositivo_eletronico": 1,
+    "consome_bebida_alcoolica": "no",
+    "historico_familiar": "yes",
+    "alimentos_calorico": "no",
+    "meio_transporte": "public_transportation",
+}
+
 
 @pytest.fixture
 def app(monkeypatch: pytest.MonkeyPatch) -> Flask:
@@ -22,21 +37,7 @@ def app(monkeypatch: pytest.MonkeyPatch) -> Flask:
 
 @pytest.fixture
 def valid_payload() -> dict[str, object]:
-    return {
-        "idade": 35,
-        "sexo_biologico": 1,
-        "come_vegetaiis": 2,
-        "refeicoes_diariamente": 3,
-        "come_entre_refeicao": "somentimes",
-        "litro_agua": 2,
-        "frequencia_semanal_atvidade_fisica": 2,
-        "horas_dispositivo_eletronico": 1,
-        "consome_bebida_alcoolica": "no",
-        "historico_familiar": "yes",
-        "alimentos_calorico": "no",
-        "meio_transporte": "public_transportation",
-        "obesity": "Normal_Weight",
-    }
+    return {**VALID_INPUT}
 
 
 class DomainServiceStub:
@@ -59,8 +60,9 @@ class DomainServiceStub:
 
 class RecordServiceStub:
     def __init__(self, payload):
+        record_data = {**payload, "obesity": "Normal_Weight"}
         self.record = SimpleNamespace(
-            id=uuid4(), created_at=datetime(2026, 7, 3, tzinfo=timezone.utc), **payload
+            id=uuid4(), created_at=datetime(2026, 7, 3, tzinfo=UTC), **record_data
         )
 
     def create_record(self, command):
