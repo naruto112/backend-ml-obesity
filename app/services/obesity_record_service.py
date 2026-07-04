@@ -13,6 +13,10 @@ class Transaction(Protocol):
     def rollback(self) -> None: ...
 
 
+class ObesityPredictor(Protocol):
+    def predict(self, command: Mapping[str, Any]) -> str: ...
+
+
 class ObesityRecordNotFoundError(LookupError):
     pass
 
@@ -22,13 +26,17 @@ class ObesityRecordService:
         self,
         repository: ObesityRecordRepository,
         transaction: Transaction,
+        predictor: ObesityPredictor,
     ) -> None:
         self._repository = repository
         self._transaction = transaction
+        self._predictor = predictor
 
     def create_record(self, command: Mapping[str, Any]) -> Any:
         try:
-            record = self._repository.add(command)
+            obesity_class = self._predictor.predict(command)
+            full_record = {**command, "obesity": obesity_class}
+            record = self._repository.add(full_record)
             self._transaction.commit()
             return record
         except Exception:

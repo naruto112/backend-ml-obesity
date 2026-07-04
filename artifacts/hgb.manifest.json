@@ -1,0 +1,39 @@
+{
+  "name": "hgb",
+  "version": "1.0.0",
+  "algorithm": "HistGradientBoostingClassifier",
+  "scikit_learn_version": "1.8.0",
+  "sha256": "045d8a5a494f05e919180ca1f972d1beafc54640c0eaec4be90407a9cd0b8ad2",
+  "size_bytes": 2496160,
+  "features": [
+    "Age",
+    "FCVC",
+    "NCP",
+    "CAEC",
+    "CH2O",
+    "FAF",
+    "TUE",
+    "CALC",
+    "Gender_Male",
+    "family_history_yes",
+    "FAVC_yes",
+    "MTRANS_Bike",
+    "MTRANS_Motorbike",
+    "MTRANS_Public_Transportation",
+    "MTRANS_Walking"
+  ],
+  "class_map": {
+    "0": "Insufficient_Weight",
+    "1": "Normal_Weight",
+    "2": "Obesity_Type_I",
+    "3": "Obesity_Type_II",
+    "4": "Obesity_Type_III",
+    "5": "Overweight_Level_I",
+    "6": "Overweight_Level_II"
+  },
+  "provenance": {
+    "notebook": "model.ipynb",
+    "dataset": "Obesity.csv",
+    "repository": "naruto112/data_analytics_fase4"
+  }
+}
