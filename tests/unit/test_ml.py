@@ -134,11 +134,13 @@ class TestModelLoader:
         real_sha = _sha256(model_file)
         manifest_file = tmp_path / "manifest.json"
         manifest_file.write_text(
-            json.dumps({
-                "sha256": real_sha,
-                "size_bytes": model_file.stat().st_size,
-                "algorithm": "HistGradientBoostingClassifier",
-            })
+            json.dumps(
+                {
+                    "sha256": real_sha,
+                    "size_bytes": model_file.stat().st_size,
+                    "algorithm": "HistGradientBoostingClassifier",
+                }
+            )
         )
         with pytest.raises(ModelArtifactError, match="Model type mismatch"):
             load_model(model_file, manifest_file)
