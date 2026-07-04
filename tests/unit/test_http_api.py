@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from types import SimpleNamespace
 from uuid import uuid4
 
@@ -62,7 +62,7 @@ class RecordServiceStub:
     def __init__(self, payload):
         record_data = {**payload, "obesity": "Normal_Weight"}
         self.record = SimpleNamespace(
-            id=uuid4(), created_at=datetime(2026, 7, 3, tzinfo=UTC), **record_data
+            id=uuid4(), created_at=datetime(2026, 7, 3, tzinfo=timezone.utc), **record_data
         )
 
     def create_record(self, command):
