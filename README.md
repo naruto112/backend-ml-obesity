@@ -117,7 +117,7 @@ psql "$env:DATABASE_URL" -f migrations/versions/script.sql
 - `GET /health/live` e `GET /health/ready`
 - `GET /api/v1/domains` e `GET /api/v1/domains/{field_name}`
 - `POST /api/v1/obesity-records` — aceita 12 campos, retorna 13 (com `obesity` predito)
-- `GET /api/v1/obesity-records` — lista paginada (`page`, default 1; `per_page`, default 10, max 100)
+- `GET /api/v1/obesity-records` — lista todos os registros
 - `GET /api/v1/obesity-records/{id}`
 
 ### Contrato POST /api/v1/obesity-records

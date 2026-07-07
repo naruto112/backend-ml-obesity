@@ -73,16 +73,8 @@ class RecordServiceStub:
             raise ObesityRecordNotFoundError(str(record_id))
         return self.record
 
-    def list_records(self, page, per_page):
-        return {
-            "items": [self.record],
-            "page": page,
-            "per_page": per_page,
-            "total": 1,
-            "total_pages": 1,
-            "has_next": False,
-            "has_prev": False,
-        }
+    def list_records(self):
+        return [self.record]
 
 
 def test_liveness_openapi_and_request_id(app: Flask) -> None:
@@ -137,30 +129,20 @@ def test_record_post_get_and_location(
     assert set(RECORD_FIELDS).issubset(fetched.get_json())
 
 
-def test_record_list_is_paginated(
+def test_record_list_returns_all(
     app: Flask,
     valid_payload: dict[str, object],
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     service = RecordServiceStub(valid_payload)
     monkeypatch.setattr(obesity_record_routes, "_service", lambda: service)
-    client = app.test_client()
 
-    default_page = client.get("/api/v1/obesity-records")
-    custom_page = client.get("/api/v1/obesity-records?page=2&per_page=5")
+    response = app.test_client().get("/api/v1/obesity-records")
 
-    assert default_page.status_code == 200
-    body = default_page.get_json()
-    assert body["pagination"]["per_page"] == 10
-    assert body["pagination"]["page"] == 1
+    assert response.status_code == 200
+    body = response.get_json()
     assert len(body["data"]) == 1
     assert set(RECORD_FIELDS).issubset(body["data"][0])
-    assert custom_page.get_json()["pagination"]["per_page"] == 5
-
-
-def test_record_list_rejects_invalid_pagination(app: Flask) -> None:
-    response = app.test_client().get("/api/v1/obesity-records?page=0")
-    assert response.status_code == 422
 
 
 @pytest.mark.parametrize(
