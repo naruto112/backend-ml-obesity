@@ -25,10 +25,12 @@ class DomainRepositoryStub:
 
 
 class RecordRepositoryStub:
-    def __init__(self, record=None, error: Exception | None = None) -> None:
+    def __init__(self, record=None, error: Exception | None = None, records=None) -> None:
         self.record = record
         self.error = error
         self.added = None
+        self.records = records or []
+        self.paginated_with = None
 
     def add(self, values):
         if self.error is not None:
@@ -38,6 +40,13 @@ class RecordRepositoryStub:
 
     def get_by_id(self, record_id):
         return self.record
+
+    def count(self):
+        return len(self.records)
+
+    def list_paginated(self, limit, offset):
+        self.paginated_with = (limit, offset)
+        return self.records[offset : offset + limit]
 
 
 class TransactionStub:
@@ -139,6 +148,37 @@ def test_record_service_rolls_back_on_predictor_error() -> None:
     assert repository.added is None
     assert transaction.commits == 0
     assert transaction.rollbacks == 1
+
+
+def test_record_service_paginates_middle_page() -> None:
+    records = [SimpleNamespace(id=index) for index in range(25)]
+    repository = RecordRepositoryStub(records=records)
+    service = ObesityRecordService(  # type: ignore[arg-type]
+        repository, TransactionStub(), PredictorStub()
+    )
+
+    result = service.list_records(page=2, per_page=10)
+
+    assert repository.paginated_with == (10, 10)
+    assert result["items"] == records[10:20]
+    assert result["total"] == 25
+    assert result["total_pages"] == 3
+    assert result["has_next"] is True
+    assert result["has_prev"] is True
+
+
+def test_record_service_paginates_empty_dataset() -> None:
+    service = ObesityRecordService(  # type: ignore[arg-type]
+        RecordRepositoryStub(records=[]), TransactionStub(), PredictorStub()
+    )
+
+    result = service.list_records(page=1, per_page=10)
+
+    assert result["items"] == []
+    assert result["total"] == 0
+    assert result["total_pages"] == 0
+    assert result["has_next"] is False
+    assert result["has_prev"] is False
 
 
 def test_record_service_reads_or_raises_not_found() -> None:
