@@ -74,3 +74,12 @@ def test_record_repository_adds_flushes_and_reads() -> None:
     assert session.added is record
     assert session.flushed is True
     assert repository.get_by_id(uuid4()) is record
+
+
+def test_record_repository_counts_and_lists_paginated() -> None:
+    session = SessionStub()
+    session.scalar_value = 3
+    repository = ObesityRecordRepository(session)
+
+    assert repository.count() == 3
+    assert repository.list_paginated(limit=10, offset=0) == ["field"]

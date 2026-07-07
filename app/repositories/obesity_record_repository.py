@@ -4,6 +4,8 @@ from collections.abc import Mapping
 from typing import Any, cast
 from uuid import UUID
 
+from sqlalchemy import func, select
+
 from app.models import ObesityRecord
 
 
@@ -19,3 +21,16 @@ class ObesityRecordRepository:
 
     def get_by_id(self, record_id: UUID) -> ObesityRecord | None:
         return cast(ObesityRecord | None, self._session.get(ObesityRecord, record_id))
+
+    def count(self) -> int:
+        statement = select(func.count()).select_from(ObesityRecord)
+        return int(self._session.scalar(statement) or 0)
+
+    def list_paginated(self, limit: int, offset: int) -> list[ObesityRecord]:
+        statement = (
+            select(ObesityRecord)
+            .order_by(ObesityRecord.created_at.desc(), ObesityRecord.id.desc())
+            .limit(limit)
+            .offset(offset)
+        )
+        return list(self._session.scalars(statement))

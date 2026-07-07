@@ -4,7 +4,10 @@ from app.schemas.domain_schema import DomainFieldSchema, DomainListSchema, Statu
 from app.schemas.obesity_record_schema import (
     ObesityRecordCreatedSchema,
     ObesityRecordCreateSchema,
+    ObesityRecordPageSchema,
     ObesityRecordReadSchema,
+    PageQuerySchema,
+    PaginationMetaSchema,
 )
 from app.schemas.problem_schema import ProblemSchema
 
@@ -13,7 +16,10 @@ __all__ = [
     "DomainListSchema",
     "ObesityRecordCreateSchema",
     "ObesityRecordCreatedSchema",
+    "ObesityRecordPageSchema",
     "ObesityRecordReadSchema",
+    "PageQuerySchema",
+    "PaginationMetaSchema",
     "ProblemSchema",
     "StatusSchema",
 ]
