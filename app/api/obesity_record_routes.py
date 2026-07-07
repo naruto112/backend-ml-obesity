@@ -14,9 +14,8 @@ from app.extensions import db
 from app.repositories import ObesityRecordRepository
 from app.schemas import (
     ObesityRecordCreatedSchema,
-    ObesityRecordPageSchema,
+    ObesityRecordListSchema,
     ObesityRecordReadSchema,
-    PageQuerySchema,
 )
 from app.schemas.obesity_record_schema import ObesityRecordCreateSchema
 from app.services import ObesityRecordService
@@ -46,27 +45,11 @@ def _serialize_record(record: Any) -> dict[str, Any]:
 
 @record_blueprint.route("")
 class ObesityRecordCollection(MethodView):
-    @record_blueprint.doc(
-        responses={
-            "422": {"description": "Invalid pagination parameters"},
-            "500": {"description": "Internal error"},
-        }
-    )
-    @record_blueprint.arguments(PageQuerySchema, location="query")
-    @record_blueprint.response(200, ObesityRecordPageSchema)
-    def get(self, query_args: dict[str, int]) -> dict[str, Any]:
-        result = _service().list_records(query_args["page"], query_args["per_page"])
-        return {
-            "data": [_serialize_record(record) for record in result["items"]],
-            "pagination": {
-                "page": result["page"],
-                "per_page": result["per_page"],
-                "total": result["total"],
-                "total_pages": result["total_pages"],
-                "has_next": result["has_next"],
-                "has_prev": result["has_prev"],
-            },
-        }
+    @record_blueprint.doc(responses={"500": {"description": "Internal error"}})
+    @record_blueprint.response(200, ObesityRecordListSchema)
+    def get(self) -> dict[str, Any]:
+        records = _service().list_records()
+        return {"data": [_serialize_record(record) for record in records]}
 
     @record_blueprint.doc(
         requestBody={

@@ -49,17 +49,5 @@ class ObesityRecordService:
             raise ObesityRecordNotFoundError(str(record_id))
         return record
 
-    def list_records(self, page: int, per_page: int) -> dict[str, Any]:
-        total = self._repository.count()
-        offset = (page - 1) * per_page
-        items = self._repository.list_paginated(per_page, offset)
-        total_pages = (total + per_page - 1) // per_page if total else 0
-        return {
-            "items": items,
-            "page": page,
-            "per_page": per_page,
-            "total": total,
-            "total_pages": total_pages,
-            "has_next": page < total_pages,
-            "has_prev": page > 1 and total_pages > 0,
-        }
+    def list_records(self) -> list[Any]:
+        return list(self._repository.list_all())

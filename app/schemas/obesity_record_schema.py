@@ -85,36 +85,15 @@ class ObesityRecordReadSchema(Schema):
     )
 
 
-class PageQuerySchema(Schema):
-    """Validate pagination query-string parameters."""
-
-    page = fields.Integer(load_default=1, validate=validate.Range(min=1, error="out_of_range"))
-    per_page = fields.Integer(
-        load_default=10, validate=validate.Range(min=1, max=100, error="out_of_range")
-    )
-
-
-class PaginationMetaSchema(Schema):
-    page = fields.Integer(required=True)
-    per_page = fields.Integer(required=True)
-    total = fields.Integer(required=True)
-    total_pages = fields.Integer(required=True)
-    has_next = fields.Boolean(required=True)
-    has_prev = fields.Boolean(required=True)
-
-
-class ObesityRecordPageSchema(Schema):
-    """Paginated collection of obesity records."""
+class ObesityRecordListSchema(Schema):
+    """Collection of all obesity records."""
 
     data = fields.List(fields.Nested(ObesityRecordReadSchema), required=True)
-    pagination = fields.Nested(PaginationMetaSchema, required=True)
 
 
 __all__ = [
     "ObesityRecordCreateSchema",
     "ObesityRecordCreatedSchema",
-    "ObesityRecordPageSchema",
+    "ObesityRecordListSchema",
     "ObesityRecordReadSchema",
-    "PageQuerySchema",
-    "PaginationMetaSchema",
 ]
