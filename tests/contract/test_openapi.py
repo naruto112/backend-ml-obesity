@@ -23,7 +23,7 @@ def test_ct_contrato_openapi_contains_all_routes_and_input_schema(app) -> None:
         "/api/v1/obesity-records/{record_id}",
     }
     create = document["components"]["schemas"]["ObesityRecordCreate"]
-    assert len(create["required"]) == 12
+    assert len(create["required"]) == 14
     assert "obesity" not in create["required"]
     post = document["paths"]["/api/v1/obesity-records"]["post"]
     assert post["requestBody"]["required"] is True

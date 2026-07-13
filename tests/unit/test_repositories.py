@@ -63,6 +63,8 @@ def test_record_repository_adds_flushes_and_reads() -> None:
         "consome_bebida_alcoolica": "no",
         "historico_familiar": "yes",
         "alimentos_calorico": "no",
+        "monitora_calorias": "no",
+        "fuma": "no",
         "meio_transporte": "walking",
         "obesity": "Normal_Weight",
     }

@@ -24,10 +24,10 @@ def test_ct_db_seed_is_idempotent_and_catalog_is_complete() -> None:
     seed(DATABASE_URL)
     engine = create_engine(DATABASE_URL)
     with Session(engine) as session:
-        assert session.scalar(select(func.count()).select_from(DomainField)) == 12
-        assert session.scalar(select(func.count()).select_from(DomainOption)) == 45
+        assert session.scalar(select(func.count()).select_from(DomainField)) == 14
+        assert session.scalar(select(func.count()).select_from(DomainOption)) == 49
         domains = DomainRepository(session).list_active_with_options()
-        assert len(domains) == 12
+        assert len(domains) == 14
         assert domains[0].name == "sexo_biologico"
         assert domains[0].options[0].value == "1"
     engine.dispose()
@@ -47,6 +47,8 @@ def test_ct_db_record_round_trip_and_check_constraint() -> None:
         "consome_bebida_alcoolica": "no",
         "historico_familiar": "yes",
         "alimentos_calorico": "no",
+        "monitora_calorias": "no",
+        "fuma": "no",
         "meio_transporte": "public_transportation",
         "obesity": "Normal_Weight",
     }
