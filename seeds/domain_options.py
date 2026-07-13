@@ -96,6 +96,18 @@ CATALOG: tuple[dict[str, Any], ...] = (
         "options": (("yes", "Sim"), ("no", "Nao")),
     },
     {
+        "name": "monitora_calorias",
+        "label": "Monitora calorias consumidas",
+        "type": "string",
+        "options": (("yes", "Sim"), ("no", "Nao")),
+    },
+    {
+        "name": "fuma",
+        "label": "Fumante",
+        "type": "string",
+        "options": (("yes", "Sim"), ("no", "Nao")),
+    },
+    {
         "name": "meio_transporte",
         "label": "Meio de transporte",
         "type": "string",

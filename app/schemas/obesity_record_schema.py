@@ -30,7 +30,7 @@ def _string_domain(field_name: str) -> StrictString:
 
 
 class ObesityRecordCreateSchema(Schema):
-    """Validate the exact 12-field v1 input contract (obesity is server-derived)."""
+    """Validate the exact 14-field v1 input contract (obesity is server-derived)."""
 
     error_messages = {"unknown": "unknown_field"}
 
@@ -53,6 +53,8 @@ class ObesityRecordCreateSchema(Schema):
     consome_bebida_alcoolica = _string_domain("consome_bebida_alcoolica")
     historico_familiar = _string_domain("historico_familiar")
     alimentos_calorico = _string_domain("alimentos_calorico")
+    monitora_calorias = _string_domain("monitora_calorias")
+    fuma = _string_domain("fuma")
     meio_transporte = _string_domain("meio_transporte")
 
 
@@ -62,7 +64,7 @@ class ObesityRecordCreatedSchema(Schema):
 
 
 class ObesityRecordReadSchema(Schema):
-    """Read schema with all 13 fields: 12 inputs + server-derived obesity."""
+    """Read schema with all 15 fields: 14 inputs + server-derived obesity."""
 
     id = fields.UUID(required=True)
     created_at = fields.String(required=True)
@@ -78,6 +80,8 @@ class ObesityRecordReadSchema(Schema):
     consome_bebida_alcoolica = StrictString(required=True)
     historico_familiar = StrictString(required=True)
     alimentos_calorico = StrictString(required=True)
+    monitora_calorias = StrictString(required=True)
+    fuma = StrictString(required=True)
     meio_transporte = StrictString(required=True)
     obesity = StrictString(
         required=True,

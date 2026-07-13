@@ -26,6 +26,8 @@ SAMPLE_COMMAND = {
     "consome_bebida_alcoolica": "no",
     "historico_familiar": "yes",
     "alimentos_calorico": "no",
+    "monitora_calorias": "no",
+    "fuma": "no",
     "meio_transporte": "public_transportation",
 }
 
@@ -64,6 +66,20 @@ class TestFeatureTransformer:
         no_cmd = {**SAMPLE_COMMAND, "alimentos_calorico": "no"}
         assert transformer.transform(yes_cmd)["FAVC_yes"].iloc[0] == 1
         assert transformer.transform(no_cmd)["FAVC_yes"].iloc[0] == 0
+
+    def test_scc_encoding(self):
+        transformer = FeatureTransformer()
+        yes_cmd = {**SAMPLE_COMMAND, "monitora_calorias": "yes"}
+        no_cmd = {**SAMPLE_COMMAND, "monitora_calorias": "no"}
+        assert transformer.transform(yes_cmd)["SCC_yes"].iloc[0] == 1
+        assert transformer.transform(no_cmd)["SCC_yes"].iloc[0] == 0
+
+    def test_smoke_encoding(self):
+        transformer = FeatureTransformer()
+        yes_cmd = {**SAMPLE_COMMAND, "fuma": "yes"}
+        no_cmd = {**SAMPLE_COMMAND, "fuma": "no"}
+        assert transformer.transform(yes_cmd)["SMOKE_yes"].iloc[0] == 1
+        assert transformer.transform(no_cmd)["SMOKE_yes"].iloc[0] == 0
 
     def test_mtrans_encoding_public_transportation(self):
         transformer = FeatureTransformer()

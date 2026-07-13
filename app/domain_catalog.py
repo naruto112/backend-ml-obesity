@@ -19,6 +19,8 @@ INPUT_FIELDS: Final[tuple[str, ...]] = (
     "consome_bebida_alcoolica",
     "historico_familiar",
     "alimentos_calorico",
+    "monitora_calorias",
+    "fuma",
     "meio_transporte",
 )
 
@@ -46,6 +48,8 @@ DOMAIN_VALUES = MappingProxyType(
         "consome_bebida_alcoolica": ("no", "somentimes", "frequently", "always"),
         "historico_familiar": ("yes", "no"),
         "alimentos_calorico": ("yes", "no"),
+        "monitora_calorias": ("yes", "no"),
+        "fuma": ("yes", "no"),
         "meio_transporte": (
             "automobile",
             "motorbike",

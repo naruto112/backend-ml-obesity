@@ -24,6 +24,8 @@ VALID_INPUT = {
     "consome_bebida_alcoolica": "no",
     "historico_familiar": "yes",
     "alimentos_calorico": "no",
+    "monitora_calorias": "no",
+    "fuma": "no",
     "meio_transporte": "public_transportation",
 }
 

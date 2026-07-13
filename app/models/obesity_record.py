@@ -38,6 +38,8 @@ class ObesityRecord(db.Model):  # type: ignore[name-defined]
         ),
         CheckConstraint("historico_familiar IN ('yes', 'no')", name="ck_record_historico"),
         CheckConstraint("alimentos_calorico IN ('yes', 'no')", name="ck_record_calorico"),
+        CheckConstraint("monitora_calorias IN ('yes', 'no')", name="ck_record_monitora_calorias"),
+        CheckConstraint("fuma IN ('yes', 'no')", name="ck_record_fuma"),
         CheckConstraint(
             "meio_transporte IN ('automobile', 'motorbike', 'bike', "
             "'public_transportation', 'walking')",
@@ -64,6 +66,8 @@ class ObesityRecord(db.Model):  # type: ignore[name-defined]
     consome_bebida_alcoolica: Mapped[str] = mapped_column(String(16), nullable=False)
     historico_familiar: Mapped[str] = mapped_column(String(3), nullable=False)
     alimentos_calorico: Mapped[str] = mapped_column(String(3), nullable=False)
+    monitora_calorias: Mapped[str] = mapped_column(String(3), nullable=False)
+    fuma: Mapped[str] = mapped_column(String(3), nullable=False)
     meio_transporte: Mapped[str] = mapped_column(String(32), nullable=False)
     obesity: Mapped[str] = mapped_column(String(32), nullable=False)
     created_at: Mapped[datetime] = mapped_column(

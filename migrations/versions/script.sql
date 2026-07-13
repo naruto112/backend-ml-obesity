@@ -47,6 +47,8 @@ CREATE TABLE obesity_record (
     consome_bebida_alcoolica VARCHAR(16) NOT NULL,
     historico_familiar VARCHAR(3) NOT NULL,
     alimentos_calorico VARCHAR(3) NOT NULL,
+    monitora_calorias VARCHAR(3) NOT NULL,
+    fuma VARCHAR(3) NOT NULL,
     meio_transporte VARCHAR(32) NOT NULL,
     obesity VARCHAR(32) NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
@@ -85,6 +87,12 @@ CREATE TABLE obesity_record (
 
     CONSTRAINT ck_record_calorico
         CHECK (alimentos_calorico IN ('yes', 'no')),
+
+    CONSTRAINT ck_record_monitora_calorias
+        CHECK (monitora_calorias IN ('yes', 'no')),
+
+    CONSTRAINT ck_record_fuma
+        CHECK (fuma IN ('yes', 'no')),
 
     CONSTRAINT ck_record_transporte
         CHECK (meio_transporte IN (

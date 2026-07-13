@@ -1,27 +1,27 @@
 # Obesity Data API
 
-API Flask/PostgreSQL para consultar 12 dominios e cadastrar registros de
+API Flask/PostgreSQL para consultar 14 dominios e cadastrar registros de
 obesidade com **predicao automatica via Machine Learning** (HistGradientBoostingClassifier).
 
-O cliente envia os 12 campos do formulario e a API prediz a classe de obesidade
-server-side antes de persistir o registro (13 campos no banco).
+O cliente envia os 14 campos do formulario e a API prediz a classe de obesidade
+server-side antes de persistir o registro (15 campos no banco).
 
 ## Arquitetura ML
 
 ```
-POST /api/v1/obesity-records (12 campos)
+POST /api/v1/obesity-records (14 campos)
   │
-  ├─ Validacao (schema 12 inputs)
-  ├─ FeatureTransformer (12 inputs → 15 features)
+  ├─ Validacao (schema 14 inputs)
+  ├─ FeatureTransformer (14 inputs → 17 features)
   ├─ ObesityPredictor (model.predict → classe)
-  └─ Persistencia (12 inputs + obesity predito)
+  └─ Persistencia (14 inputs + obesity predito)
 ```
 
 ### Pipeline de inferencia (`app/ml/`)
 
 | Modulo | Responsabilidade |
 |--------|-----------------|
-| `feature_transformer.py` | Transforma os 12 campos da API em DataFrame com 15 features (ordinal encoding, one-hot, MTRANS dummies) |
+| `feature_transformer.py` | Transforma os 14 campos da API em DataFrame com 17 features (ordinal encoding, one-hot, MTRANS dummies) |
 | `model_loader.py` | Verifica integridade do artefato (SHA-256 + tamanho) e carrega o modelo |
 | `predictor.py` | Orquestra transformacao + predicao + mapeamento codigo→classe |
 
@@ -53,7 +53,7 @@ POST /api/v1/obesity-records (12 campos)
 | 5 | Overweight_Level_I |
 | 6 | Overweight_Level_II |
 
-### Transformacao de features (12 → 15)
+### Transformacao de features (14 → 17)
 
 | Feature | Campo API | Transformacao |
 |---------|-----------|---------------|
@@ -68,6 +68,8 @@ POST /api/v1/obesity-records (12 campos)
 | Gender_Male | sexo_biologico | 1 se masculino(1), 0 se feminino(2) |
 | family_history_yes | historico_familiar | 1 se "yes", 0 se "no" |
 | FAVC_yes | alimentos_calorico | 1 se "yes", 0 se "no" |
+| SCC_yes | monitora_calorias | 1 se "yes", 0 se "no" |
+| SMOKE_yes | fuma | 1 se "yes", 0 se "no" |
 | MTRANS_Bike | meio_transporte | one-hot (automobile e referencia = zeros) |
 | MTRANS_Motorbike | meio_transporte | one-hot |
 | MTRANS_Public_Transportation | meio_transporte | one-hot |
@@ -126,13 +128,13 @@ psql "$env:DATABASE_URL" -f migrations/versions/script.sql
 
 - `GET /health/live` e `GET /health/ready`
 - `GET /api/v1/domains` e `GET /api/v1/domains/{field_name}`
-- `POST /api/v1/obesity-records` — aceita 12 campos, retorna 13 (com `obesity` predito)
+- `POST /api/v1/obesity-records` — aceita 14 campos, retorna 15 (com `obesity` predito)
 - `GET /api/v1/obesity-records` — lista todos os registros
 - `GET /api/v1/obesity-records/{id}`
 
 ### Contrato POST /api/v1/obesity-records
 
-**Request (12 campos):**
+**Request (14 campos):**
 
 ```json
 {
@@ -147,11 +149,13 @@ psql "$env:DATABASE_URL" -f migrations/versions/script.sql
   "consome_bebida_alcoolica": "no",
   "historico_familiar": "yes",
   "alimentos_calorico": "no",
+  "monitora_calorias": "no",
+  "fuma": "no",
   "meio_transporte": "public_transportation"
 }
 ```
 
-**Response (13 campos — obesity predito pelo modelo):**
+**Response (15 campos — obesity predito pelo modelo):**
 
 ```json
 {

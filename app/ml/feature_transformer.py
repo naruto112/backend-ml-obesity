@@ -1,4 +1,4 @@
-"""Transform the 12 API input fields into the 15-feature DataFrame expected by the model."""
+"""Transform the 14 API input fields into the 17-feature DataFrame expected by the model."""
 
 from __future__ import annotations
 
@@ -26,6 +26,8 @@ FEATURE_COLUMNS: list[str] = [
     "Gender_Male",
     "family_history_yes",
     "FAVC_yes",
+    "SCC_yes",
+    "SMOKE_yes",
     "MTRANS_Bike",
     "MTRANS_Motorbike",
     "MTRANS_Public_Transportation",
@@ -41,7 +43,7 @@ MTRANS_FEATURES: dict[str, str] = {
 
 
 class FeatureTransformer:
-    """Convert a validated API command (12 fields) into a single-row DataFrame with 15 features."""
+    """Convert a validated API command (14 fields) into a single-row DataFrame with 17 features."""
 
     def transform(self, command: Mapping[str, Any]) -> pd.DataFrame:
         transport = str(command["meio_transporte"])
@@ -58,6 +60,8 @@ class FeatureTransformer:
             "Gender_Male": 1 if int(command["sexo_biologico"]) == 1 else 0,
             "family_history_yes": 1 if str(command["historico_familiar"]) == "yes" else 0,
             "FAVC_yes": 1 if str(command["alimentos_calorico"]) == "yes" else 0,
+            "SCC_yes": 1 if str(command["monitora_calorias"]) == "yes" else 0,
+            "SMOKE_yes": 1 if str(command["fuma"]) == "yes" else 0,
             "MTRANS_Bike": 1 if transport == "bike" else 0,
             "MTRANS_Motorbike": 1 if transport == "motorbike" else 0,
             "MTRANS_Public_Transportation": 1 if transport == "public_transportation" else 0,
