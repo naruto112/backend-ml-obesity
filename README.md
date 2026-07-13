@@ -30,6 +30,16 @@ POST /api/v1/obesity-records (12 campos)
 - Arquivo: `artifacts/hgb.joblib` (HistGradientBoostingClassifier)
 - Manifesto: `artifacts/hgb.manifest.json` (SHA-256, features, classes)
 - Verificacao: `python scripts/verify_model_artifact.py artifacts/hgb.manifest.json`
+- Gerar/atualizar manifesto: `python scripts/generate_model_manifest.py artifacts/hgb.joblib`
+  (extrai SHA-256, tamanho, algoritmo, features e versao do sklearn do modelo;
+  reaproveita `version`, `class_map` e `provenance` do manifesto existente. Use
+  `-` como destino para imprimir sem gravar. Sempre revise os campos marcados
+  com `TODO` antes de commitar.)
+
+> Trocou o `.joblib`? O `hgb.manifest.json` fixa o hash/tamanho do artefato,
+> entao a API falha com `SHA-256 mismatch` ate o manifesto ser regenerado.
+> Rode o gerador acima e confira se as `features` do novo modelo batem com as
+> produzidas por `feature_transformer.py`.
 
 ### Classes preditas
 
