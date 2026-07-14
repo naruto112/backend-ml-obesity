@@ -51,7 +51,27 @@ class DomainServiceStub:
                 "type": "integer",
                 "required": True,
                 "options": [{"value": 1, "label": "Masculino", "order": 1}],
-            }
+            },
+            {
+                "field": "monitora_calorias",
+                "label": "Monitora calorias consumidas",
+                "type": "string",
+                "required": True,
+                "options": [
+                    {"value": "yes", "label": "Sim", "order": 1},
+                    {"value": "no", "label": "Nao", "order": 2},
+                ],
+            },
+            {
+                "field": "fuma",
+                "label": "Fumante",
+                "type": "string",
+                "required": True,
+                "options": [
+                    {"value": "yes", "label": "Sim", "order": 1},
+                    {"value": "no", "label": "Nao", "order": 2},
+                ],
+            },
         ]
 
     def get_active_domain(self, field_name: str):
@@ -107,6 +127,9 @@ def test_domain_routes_and_not_found(app: Flask, monkeypatch: pytest.MonkeyPatch
 
     assert listed.status_code == 200
     assert listed.get_json()["data"][0]["options"][0]["value"] == 1
+    domains = {domain["field"]: domain for domain in listed.get_json()["data"]}
+    assert [option["value"] for option in domains["monitora_calorias"]["options"]] == ["yes", "no"]
+    assert [option["value"] for option in domains["fuma"]["options"]] == ["yes", "no"]
     assert item.status_code == 200
     assert missing.status_code == 404
     assert missing.content_type == "application/problem+json"
