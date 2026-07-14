@@ -30,6 +30,9 @@ def test_ct_db_seed_is_idempotent_and_catalog_is_complete() -> None:
         assert len(domains) == 14
         assert domains[0].name == "sexo_biologico"
         assert domains[0].options[0].value == "1"
+        by_name = {domain.name: domain for domain in domains}
+        assert [option.value for option in by_name["monitora_calorias"].options] == ["yes", "no"]
+        assert [option.value for option in by_name["fuma"].options] == ["yes", "no"]
     engine.dispose()
 
 
