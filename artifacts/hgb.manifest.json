@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "algorithm": "HistGradientBoostingClassifier",
   "scikit_learn_version": "1.7.2",
-  "sha256": "c706ab0580386c03706c1055a029d63b3ae8b1ae28597f49c58e3daa9d930a07",
-  "size_bytes": 2494752,
+  "sha256": "1d3201e03de8239feb4852fb4e3a878e79d32510d4193f49d1c29f2c2904f1d0",
+  "size_bytes": 2508416,
   "features": [
     "Age",
     "FCVC",
